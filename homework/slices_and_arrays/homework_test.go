@@ -10,36 +10,94 @@ import (
 // go test -v homework_test.go
 
 type CircularQueue struct {
-	values []int
-	// need to implement
+	values   []int
+	capacity int
+	size     int
+	headIdx  *int
 }
 
 func NewCircularQueue(size int) CircularQueue {
-	return CircularQueue{} // need to implement
+	return CircularQueue{
+		values:   make([]int, size),
+		capacity: size,
+		size:     0,
+		headIdx:  nil,
+	}
 }
 
 func (q *CircularQueue) Push(value int) bool {
-	return false // need to implement
+	// queue is full
+	if q.Full() {
+		return false
+	}
+
+	lastTakenIdx := func() int {
+		if q.headIdx != nil {
+			return *q.headIdx + q.size - 1
+		}
+		// queue is empty
+		return q.capacity - 1
+	}
+
+	// get next free position index
+	nextFreeIdx := (lastTakenIdx() + 1) % q.capacity
+
+	// push value
+	q.values[nextFreeIdx] = value
+	q.size++
+
+	// set head if it is the first value
+	if q.headIdx == nil {
+		q.headIdx = &nextFreeIdx
+	}
+
+	return true
 }
 
 func (q *CircularQueue) Pop() bool {
-	return false // need to implement
+	// empty queue
+	if q.Empty() {
+		return false
+	}
+
+	q.size--
+
+	// empty queue
+	if q.Empty() {
+		q.headIdx = nil
+		return true
+	}
+
+	// shit queue head by 1
+	nextHeadIdx := (*q.headIdx + 1) % q.capacity
+	q.headIdx = &nextHeadIdx
+
+	return true
 }
 
 func (q *CircularQueue) Front() int {
-	return -1 // need to implement
+	if q.Empty() {
+		return -1
+	}
+
+	return q.values[*q.headIdx]
 }
 
 func (q *CircularQueue) Back() int {
-	return -1 // need to implement
+	if q.Empty() {
+		return -1
+	}
+
+	lastValueIdx := (*q.headIdx + q.size - 1) % q.capacity
+	return q.values[lastValueIdx]
 }
 
 func (q *CircularQueue) Empty() bool {
-	return false // need to implement
+	return q.size == 0
 }
 
 func (q *CircularQueue) Full() bool {
-	return false // need to implement
+	return q.size == q.capacity
 }
 
 func TestCircularQueue(t *testing.T) {
