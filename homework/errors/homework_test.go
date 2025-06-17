@@ -16,6 +16,10 @@ type MultiError struct {
 }
 
 func (e *MultiError) Error() string {
+	if e == nil {
+		return ""
+	}
+
 	messages := make([]string, 0, len(e.errs))
 	for i := range e.errs {
 		if e.errs[i] == nil {
